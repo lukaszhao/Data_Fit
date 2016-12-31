@@ -14,7 +14,7 @@ namespace Csharp_001
 {
     public partial class Form1 : Form
     {
-        private List<double> data_x = new List<double>();    //note: in C#, a List is like a vector in C++; C#'s LinkedList is like list in C++
+        private List<double> data_x = new List<double>();    // note: in C#, a List is like a vector in C++; C#'s LinkedList is like list in C++
         private List<double> data_y = new List<double>();
         private List<double> fit_x = new List<double>();
         private List<double> fit_y = new List<double>();
@@ -30,7 +30,7 @@ namespace Csharp_001
             for(int i=1; i<101; ++i)
             {
                 double x = Convert.ToDouble(i) / 10.0;
-                double y = Math.Exp(-Math.Pow((x - 5),2));
+                double y = Math.Exp(-Math.Pow((x - 5), 2) / 2);
                 chart1.Series["Data"].Points.AddXY(x, y);
                 chart1.Series["Fit"].Points.AddXY(x, y);
             }
@@ -46,25 +46,30 @@ namespace Csharp_001
             OpenFileDialog ofd = new OpenFileDialog();
             if(ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                StreamReader sr = new StreamReader(File.OpenRead(ofd.FileName));
-                data_x.Clear();
-                data_y.Clear();
-                fit_x.Clear();
-                fit_y.Clear();
-                while(sr.EndOfStream == false)
+                try
                 {
-                    string line = sr.ReadLine();
-                    if (line == "") { continue; }
-                    string[] parsedWords = stringParser(line);
-                    if (parsedWords[0] != "failed")
+                    StreamReader sr = new StreamReader(File.OpenRead(ofd.FileName));
+                    data_x.Clear();
+                    data_y.Clear();
+                    fit_x.Clear();
+                    fit_y.Clear();
+                    while (sr.EndOfStream == false)
                     {
-                        data_x.Add(Convert.ToDouble(parsedWords[0]));
-                        data_y.Add(Convert.ToDouble(parsedWords[1]));
+                        string line = sr.ReadLine();
+                        if (line == "") { continue; }
+                        string[] parsedWords = stringParser(line);
+                        if (parsedWords[0] != "failed")
+                        {
+                            data_x.Add(Convert.ToDouble(parsedWords[0]));
+                            data_y.Add(Convert.ToDouble(parsedWords[1]));
+                        }
                     }
-                    
+                    plotData();
+                    sr.Dispose();
                 }
-                plotData();
-                sr.Dispose();
+                catch {
+                    MessageBox.Show("Reading data file failed.");
+                }
             }
         }
 
